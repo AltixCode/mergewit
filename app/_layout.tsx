@@ -10,6 +10,7 @@ import { isRTLLanguage, t } from '@/i18n';
 import { bootstrapAds } from '@/monetization/ads';
 import { shouldShowAds } from '@/monetization/entitlements';
 import { preloadInterstitial } from '@/monetization/interstitial';
+import { useBoardStore } from "@/store/useBoardStore";
 import { usePremiumStore } from '@/store/usePremiumStore';
 import { ThemeProvider, useTheme } from '@/theme';
 
@@ -26,11 +27,14 @@ function RootNavigator() {
   const isPremium = usePremiumStore((s) => s.isPremium);
   const isReady = usePremiumStore((s) => s.isReady);
   const initialize = usePremiumStore((s) => s.initialize);
+  const hydrateBoard = useBoardStore((s) => s.hydrate);
 
   useEffect(() => {
     void initialize();
+    // Restores the board in progress, the best score, the theme and the day stats.
+    void hydrateBoard();
     void SplashScreen.hideAsync();
-  }, [initialize]);
+  }, [initialize, hydrateBoard]);
 
   useEffect(() => {
     // Ads bootstrap (and the iOS tracking prompt) is deferred until we know the user is not
@@ -54,6 +58,7 @@ function RootNavigator() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: t('settingsTitle') }} />
+        <Stack.Screen name="daily" options={{ title: t("archiveTitle") }} />
         <Stack.Screen
           name="paywall"
           options={{ title: '', presentation: 'modal', headerShown: false }}
