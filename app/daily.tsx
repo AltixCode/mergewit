@@ -9,6 +9,7 @@ import { archiveDates, dateKey, isPlayable, startingGrid } from "@/logic/daily";
 import { useBoardStore } from "@/store/useBoardStore";
 import { usePremiumStore } from "@/store/usePremiumStore";
 import { useTheme } from "@/theme";
+import { gatedRow } from "@/theme/gatedRows";
 
 const MIN_TOUCH_TARGET = 44;
 /** Rows rendered at once. The archive is 365 days; a screen does not need them all. */
@@ -57,6 +58,7 @@ export default function Daily() {
 
         {dates.map((key) => {
           const playable = isPlayable(key, today, isPremium);
+          const row = gatedRow(colors, playable);
           const stat = stats[key];
           const isToday = key === todayKey;
           const label = stat
@@ -78,12 +80,12 @@ export default function Daily() {
                 paddingHorizontal: spacing.base,
                 marginTop: spacing.xs,
                 borderRadius: radius.md,
-                backgroundColor: colors.surface,
+                backgroundColor: row.background,
                 borderWidth: 1,
                 borderColor: isToday ? colors.accent : colors.border,
-                // A locked row is dimmed but still shown and still tappable — it goes to the
-                // paywall. Hiding it would mean nobody knows the archive exists.
-                opacity: playable ? 1 : 0.6,
+                // Shown and tappable — it goes to the paywall. Never dimmed: a
+                // tappable row is information, not a disabled control.
+                opacity: row.opacity,
               }}
             >
               <View style={{ flex: 1 }}>
