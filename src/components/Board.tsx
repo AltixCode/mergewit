@@ -20,11 +20,18 @@ interface BoardProps {
 
 export function Board({ grid, theme, onSwipe }: BoardProps) {
   const { colors, radius, spacing } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   // The board is square and sized from the narrower dimension so it never overflows on a
   // phone in landscape or on a small screen.
-  const side = Math.min(width - spacing.xl * 2, 420);
+  //
+  // 420 was that size on every device. On a 13" iPad it left the board -- which
+  // is the entire game -- occupying 41% of a 1032pt width, a phone board
+  // centred in a tablet. The cap now scales with the screen class, and the
+  // height term keeps a square board from pushing the score row off a short
+  // window however wide the display is.
+  const isTablet = width >= 700;
+  const side = Math.min(width - spacing.xl * 2, height * 0.55, isTablet ? 700 : 420);
   const gap = Math.max(4, Math.round(side * 0.02));
   const cell = (side - gap * (GRID + 1)) / GRID;
 
