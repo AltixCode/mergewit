@@ -79,9 +79,9 @@ export const lightPalette: Palette = {
   textMuted: '#5F5F66',
   textFaint: '#85858D',
   border: '#E6E6E1',
-  // 3.12:1 against the board well. An empty cell is drawn with this, and a
-  // component boundary needs 3:1 under WCAG AA to be seen.
-  borderStrong: '#848B7A',
+  // 3.24:1 against the light background. Use this, not `border`, for the
+  // boundary of anything a person has to SEE -- a card, a board cell, a tile.
+  borderStrong: '#8A8A82',
   accent: '#4D7C0F',
   onAccent: '#FFFFFF',
   success: '#059669',
@@ -100,10 +100,18 @@ export const darkPalette: Palette = {
   textMuted: '#A3A3AA',
   textFaint: '#6E6E76',
   border: '#26262A',
-  // 3.20:1 against the board well, in the palette's own olive. It was
-  // #3A3A40, and the empty cell had no border at all -- just a `surface`
-  // fill at 1.15:1 against the well it sits in.
-  borderStrong: '#6E7A5E',
+  // 3.49:1 against the lightest dark background any app in this portfolio
+  // generates, and 3.65:1 against the darkest. It was #3A3A40, which is
+  // 1.73:1 -- and `border` is 1.3:1 and `surface` about 1.1:1, so a board
+  // drawn with either was invisible in dark mode. That shipped: two live App
+  // Store screenshots showed grids with 70%+ of the frame indistinguishable
+  // from its own background.
+  //
+  // `#0F1408` is substituted per app, so a fixed value cannot GUARANTEE 3:1.
+  // The test in src/theme/__tests__/color.test.ts is what guarantees it: it
+  // is generated into every app and fails there if that app's background
+  // makes this value insufficient.
+  borderStrong: '#6A6A72',
   accent: '#A3E635',
   onAccent: '#0C0C0D',
   success: '#10B981',
@@ -179,4 +187,3 @@ export function scaleTypography(isTablet: boolean): ScaledTypography {
     ]),
   ) as ScaledTypography;
 }
-
