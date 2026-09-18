@@ -86,7 +86,22 @@ export function Board({ grid, theme, onSwipe }: BoardProps) {
                     alignItems: "center",
                     justifyContent: "center",
                     // An empty cell is a recess in the board, not a tile with no number.
+                    //
+                    // The fill alone cannot carry that: `surface` is 1.15:1
+                    // against the well, and the well is already the darkest
+                    // thing available, so there is nowhere darker for a recess
+                    // to go. The edge does the work instead.
+                    //
+                    // Checked on a device before changing it, because the
+                    // measurement alone argued both ways -- the board IS
+                    // visible as a panel and the game is played by swiping, so
+                    // nobody aims at a cell. What settled it: in DARK mode a
+                    // fresh 4x4 board reads as one solid rectangle unless you
+                    // zoom in, and every store screenshot in this portfolio is
+                    // captured dark. Light mode already read as a grid.
                     backgroundColor: value === 0 ? colors.surface : style.face,
+                    borderWidth: value === 0 ? StyleSheet.hairlineWidth * 2 : 0,
+                    borderColor: value === 0 ? colors.borderStrong : "transparent",
                   }}
                 >
                   {value === 0 ? null : (

@@ -79,7 +79,9 @@ export const lightPalette: Palette = {
   textMuted: '#5F5F66',
   textFaint: '#85858D',
   border: '#E6E6E1',
-  borderStrong: '#CFCFC8',
+  // 3.12:1 against the board well. An empty cell is drawn with this, and a
+  // component boundary needs 3:1 under WCAG AA to be seen.
+  borderStrong: '#848B7A',
   accent: '#4D7C0F',
   onAccent: '#FFFFFF',
   success: '#059669',
@@ -98,7 +100,10 @@ export const darkPalette: Palette = {
   textMuted: '#A3A3AA',
   textFaint: '#6E6E76',
   border: '#26262A',
-  borderStrong: '#3A3A40',
+  // 3.20:1 against the board well, in the palette's own olive. It was
+  // #3A3A40, and the empty cell had no border at all -- just a `surface`
+  // fill at 1.15:1 against the well it sits in.
+  borderStrong: '#6E7A5E',
   accent: '#A3E635',
   onAccent: '#0C0C0D',
   success: '#10B981',
