@@ -1,0 +1,35 @@
+{
+  "identifier": "506BD797-DA90-484B-BD2C-6DC8DBE3BDEE",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "5BE5E36D-C9A1-4EE1-94FF-1C4A9A9EA0B3",
+      "localizations": [
+        {
+          "description": "mergewit remove ads lifetime unlock",
+          "displayName": "mergewit remove ads",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.altixcode.mergewit.removeads",
+      "referenceName": "mergewit remove ads",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}
