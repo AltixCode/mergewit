@@ -117,11 +117,11 @@ export default function Paywall() {
 
       <ScrollView
         contentContainerStyle={{
-          padding: spacing.xl,
+          paddingHorizontal: spacing.xl,
+          paddingTop: spacing.sm,
           paddingBottom: spacing["3xl"],
           ...tabletColumn,
           flexGrow: 1,
-          justifyContent: "center",
         }}
       >
         {/* Asymmetric icon tiles, not a numbered list and not a ticked card.

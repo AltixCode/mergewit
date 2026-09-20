@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, LayoutAnimation, StyleSheet, View } from "react-native";
 
 import { BannerAdSlot } from "@/components/BannerAdSlot";
 import { Board } from "@/components/Board";
@@ -31,8 +31,13 @@ export default function Game() {
   const announcedWin = useRef(false);
   const announcedOver = useRef(false);
 
+  const showTutorial = useCallback(() => {
+    Alert.alert(t("howToPlayTitle"), t("howToPlayBody"), [{ text: t("ok") }]);
+  }, []);
+
   const onSwipe = useCallback(
     (direction: Direction) => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       if (swipe(direction) === "moved") {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
@@ -91,13 +96,19 @@ export default function Game() {
           navigation header above it, nothing else pays the notch, and the
           title renders underneath the status bar. */}
       <Screen scroll topInset>
-        <View style={styles.titleRow}>
+        <View style={[styles.titleRow, { marginTop: spacing.xs }]}>
           <View style={{ flex: 1 }}>
             <Text variant="display">{t("appName")}</Text>
             <Text variant="caption" tone="muted">
               {dayKey ?? t("freePlayTitle")}
             </Text>
           </View>
+          <Button
+            label={t("howToPlayCta")}
+            variant="ghost"
+            onPress={showTutorial}
+            style={{ marginRight: spacing.xs }}
+          />
           <View
             style={{
               alignItems: "flex-end",

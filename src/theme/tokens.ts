@@ -111,7 +111,7 @@ export const darkPalette: Palette = {
   // The test in src/theme/__tests__/color.test.ts is what guarantees it: it
   // is generated into every app and fails there if that app's background
   // makes this value insufficient.
-  borderStrong: '#6A6A72',
+  borderStrong: '#7A7A84',
   accent: '#A3E635',
   onAccent: '#0C0C0D',
   success: '#10B981',
