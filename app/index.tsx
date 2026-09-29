@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef } from "react";
-import { Alert, LayoutAnimation, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 
 import { BannerAdSlot } from "@/components/BannerAdSlot";
 import { Board } from "@/components/Board";
@@ -37,7 +37,9 @@ export default function Game() {
 
   const onSwipe = useCallback(
     (direction: Direction) => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      // The visible feedback for a swipe — which tiles it touched — is the board's own job now
+      // (`Board`'s per-cell pop, keyed off `changedCells`); a bare `LayoutAnimation` here did
+      // nothing, since the grid renders as position-keyed slots whose layout never moves.
       if (swipe(direction) === "moved") {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
@@ -172,4 +174,3 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", alignItems: "flex-start" },
   row: { flexDirection: "row", alignItems: "center" },
 });
-

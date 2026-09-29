@@ -3,6 +3,7 @@ import {
   type Direction,
   type Grid,
   canMove,
+  changedCells,
   emptyGrid,
   gridsEqual,
   hasWon,
@@ -191,6 +192,43 @@ describe("game over", () => {
     for (const d of ["left", "right", "up", "down"] as Direction[]) {
       expect(canMove(board, d)).toBe(false);
     }
+  });
+});
+
+describe("changedCells — which tiles moved or merged, for the board to animate", () => {
+  it("reports nothing changed between two identical grids", () => {
+    const board = g([
+      [2, 4, 0, 0],
+      [0, 0, 8, 0],
+    ]);
+    const mask = changedCells(board, board);
+    expect(mask.flat().some(Boolean)).toBe(false);
+  });
+
+  it("marks exactly the cells whose value differs", () => {
+    const before = g([[2, 2, 0, 0]]);
+    const after = g([[4, 0, 0, 0]]);
+    const mask = changedCells(before, after);
+    expect(mask[0]).toEqual([true, true, false, false]);
+    expect(mask.slice(1).flat().some(Boolean)).toBe(false);
+  });
+
+  it("marks a newly spawned tile as changed", () => {
+    const before = emptyGrid();
+    const after = spawn(before, () => 0);
+    const mask = changedCells(before, after);
+    expect(mask.flat().filter(Boolean)).toHaveLength(1);
+  });
+
+  it("treats a missing previous grid as all-empty, so the first render animates every tile", () => {
+    const after = g([
+      [2, 0, 0, 0],
+      [0, 0, 0, 4],
+    ]);
+    const mask = changedCells(emptyGrid(), after);
+    expect(mask[0]![0]).toBe(true);
+    expect(mask[1]![3]).toBe(true);
+    expect(mask[0]![1]).toBe(false);
   });
 });
 

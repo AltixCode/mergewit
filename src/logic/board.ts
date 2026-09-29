@@ -169,3 +169,21 @@ export function hasWon(grid: Grid): boolean {
 export function newGrid(rng: Rng = Math.random): Grid {
   return spawn(spawn(emptyGrid(), rng), rng);
 }
+
+/**
+ * Which cells differ between two grids of the same shape.
+ *
+ * Purely for presentation: the board uses this to animate exactly the tiles a swipe touched
+ * (a slid value landing on a cell, a merge, the tile it spawns afterwards) and nothing else.
+ * It does not distinguish *why* a cell changed — a slide, a merge and a spawn all get the same
+ * "something happened here" treatment, which is all the caller needs.
+ *
+ * `prev` may be shorter or missing rows/cells (the very first render has no previous grid to
+ * compare against) — a missing cell reads as empty, so that first render marks every occupied
+ * cell as changed rather than throwing.
+ */
+export function changedCells(prev: Grid, next: Grid): boolean[][] {
+  return next.map((row, r) =>
+    row.map((value, c) => value !== (prev[r]?.[c] ?? 0)),
+  );
+}

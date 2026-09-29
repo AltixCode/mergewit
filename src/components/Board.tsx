@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
-import { runOnJS } from "react-native-reanimated";
+import Animated, { runOnJS, ZoomIn } from "react-native-reanimated";
 
 import { Text } from "@/components/ui";
 import { t } from "@/i18n";
-import { GRID, type Direction, type Grid } from "@/logic/board";
+import { GRID, type Direction, type Grid, changedCells } from "@/logic/board";
 import { tileStyle } from "@/theme/tiles";
 import { useTheme } from "@/theme";
+
+/**
+ * How long a tile's arrival pop takes. A tester asked for visible feedback on every swipe — a
+ * slide-along-its-actual-path animation would need the board to track each tile's identity
+ * across a move (today `src/logic/board.ts` only knows resulting values, not which physical
+ * tile became which), which is a materially bigger change than this pass makes. This gives the
+ * same "something just happened, and here" feedback with a contained one: `changedCells` marks
+ * every cell a swipe touched — a slid tile landing, a merge, the tile it spawns — and each one
+ * pops in on its own key change, so a player sees exactly which cells the swipe affected.
+ */
+const TILE_POP_MS = 180;
 
 /** Below this the swipe is a tap that wandered, not a direction. */
 const SWIPE_THRESHOLD = 24;
@@ -18,9 +29,35 @@ interface BoardProps {
   onSwipe: (direction: Direction) => void;
 }
 
+/** A GRID×GRID grid of zeros, for the counters below to start from. */
+function zeroCounters(): number[][] {
+  return Array.from({ length: GRID }, () => new Array<number>(GRID).fill(0));
+}
+
 export function Board({ grid, theme, onSwipe }: BoardProps) {
   const { colors, radius, spacing } = useTheme();
   const { width, height } = useWindowDimensions();
+
+  // One counter per cell, bumped whenever that cell's value changes. Bumping it changes the
+  // cell's React key, so only the cells a swipe actually touched remount and play their
+  // `entering` animation — an unrelated cell keeps its key and its element instance, and
+  // renders with no animation at all.
+  //
+  // This is the "adjust state during render" pattern React documents for deriving something
+  // from a prop change without an effect: calling `setState` here, guarded by the `!==` check,
+  // bails out and re-renders with the new counters before anything commits, rather than
+  // flashing the un-bumped keys for a frame the way an effect would.
+  const [lastGrid, setLastGrid] = useState(grid);
+  const [ticks, setTicks] = useState(zeroCounters);
+  if (lastGrid !== grid) {
+    const mask = changedCells(lastGrid, grid);
+    setTicks(
+      ticks.map((row, r) =>
+        row.map((tick, c) => (mask[r]?.[c] ? tick + 1 : tick)),
+      ),
+    );
+    setLastGrid(grid);
+  }
 
   // The board is square and sized from the narrower dimension so it never overflows on a
   // phone in landscape or on a small screen.
@@ -31,7 +68,11 @@ export function Board({ grid, theme, onSwipe }: BoardProps) {
   // height term keeps a square board from pushing the score row off a short
   // window however wide the display is.
   const isTablet = width >= 700;
-  const side = Math.min(width - spacing.xl * 2, height * 0.55, isTablet ? 700 : 420);
+  const side = Math.min(
+    width - spacing.xl * 2,
+    height * 0.55,
+    isTablet ? 700 : 420,
+  );
   const gap = Math.max(4, Math.round(side * 0.02));
   const cell = (side - gap * (GRID + 1)) / GRID;
 
@@ -76,8 +117,9 @@ export function Board({ grid, theme, onSwipe }: BoardProps) {
             {row.map((value, c) => {
               const style = tileStyle(theme, value);
               return (
-                <View
-                  key={c}
+                <Animated.View
+                  key={`${c}-${ticks[r]![c]}`}
+                  entering={ZoomIn.duration(TILE_POP_MS)}
                   style={{
                     width: cell,
                     height: cell,
@@ -101,7 +143,8 @@ export function Board({ grid, theme, onSwipe }: BoardProps) {
                     // captured dark. Light mode already read as a grid.
                     backgroundColor: value === 0 ? colors.surface : style.face,
                     borderWidth: value === 0 ? StyleSheet.hairlineWidth * 2 : 0,
-                    borderColor: value === 0 ? colors.borderStrong : "transparent",
+                    borderColor:
+                      value === 0 ? colors.borderStrong : "transparent",
                   }}
                 >
                   {value === 0 ? null : (
@@ -117,7 +160,7 @@ export function Board({ grid, theme, onSwipe }: BoardProps) {
                       {String(value)}
                     </Text>
                   )}
-                </View>
+                </Animated.View>
               );
             })}
           </View>
